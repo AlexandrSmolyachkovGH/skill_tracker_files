@@ -29,6 +29,7 @@ dependencies = [
     "pytest-asyncio (>=1.1.0,<2.0.0)",
     "pytest-mock (>=3.14.1,<4.0.0)",
     "httpx (>=0.28.1,<0.29.0)",
+    "ruff (>=0.12.7,<0.13.0)",
 ]
 
 [tool.poetry]
@@ -40,6 +41,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.2.0"
+types-requests = "^2.32.4.20250611"
 
 [tool.black]
 line-length = 79
@@ -86,3 +88,9 @@ disallow_untyped_defs = true
 check_untyped_defs = true
 warn_unused_ignores = true
 exclude = '(.*/migrations/.*$|.*/settings.*$)'
+
+[tool.ruff]
+select = ["Q"]
+
+[tool.ruff.format]
+quote-style = "double"

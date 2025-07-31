@@ -1,14 +1,16 @@
+from io import BytesIO
+from typing import Annotated
+
 from fastapi import (
     APIRouter,
-    UploadFile,
     File,
+    UploadFile,
     status,
 )
-from io import BytesIO
 from fastapi.responses import (
     JSONResponse,
-    StreamingResponse,
     Response,
+    StreamingResponse,
 )
 
 from file_service.schemes.files import FileUploadResponse
@@ -23,7 +25,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def upload_file(
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File(...)],
 ) -> FileUploadResponse:
     content = await file.read()
     content_type = file.content_type or "application/octet-stream"

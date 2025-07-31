@@ -1,9 +1,6 @@
 from unittest.mock import MagicMock
 
-from motor.motor_asyncio import (
-    AsyncIOMotorClient,
-    AsyncIOMotorDatabase,
-)
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from file_service.connections.mongo_connection import mongo_tool
 
@@ -27,8 +24,7 @@ def test_get_mongo_client(
     assert isinstance(client, AsyncIOMotorClient)
 
 
-def test_get_mongo_db(
-) -> None:
+def test_get_mongo_db() -> None:
     db = mongo_tool.get_mongo_db()
 
     assert isinstance(db, AsyncIOMotorDatabase)

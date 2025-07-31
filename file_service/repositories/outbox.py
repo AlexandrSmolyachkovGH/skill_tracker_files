@@ -1,3 +1,6 @@
+from motor.motor_asyncio import (
+    AsyncIOMotorDatabase,
+)
 from pydantic import ValidationError
 
 from file_service.connections.mongo_connection import mongo_tool
@@ -9,7 +12,7 @@ class OutboxMongoRepository:
         self.coll = "file_keys"
 
     @property
-    def db(self):
+    def db(self) -> AsyncIOMotorDatabase:
         return mongo_tool.get_mongo_db()
 
     async def add_document(self, document: dict) -> None:
@@ -45,5 +48,6 @@ class OutboxMongoRepository:
         Delete all delivered documents
         """
         await self.db[self.coll].delete_many({"status": status})
+
 
 outbox_repository = OutboxMongoRepository()

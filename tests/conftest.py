@@ -1,16 +1,11 @@
-from unittest.mock import (
-    AsyncMock,
-    MagicMock,
-)
-from httpx import (
-    AsyncClient,
-    ASGITransport,
-)
-import pytest_asyncio
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
+import pytest_asyncio
 from _pytest.monkeypatch import MonkeyPatch
-from pytest_mock import MockerFixture
 from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
+from pytest_mock import MockerFixture
 
 from file_service.main import app as real_app
 

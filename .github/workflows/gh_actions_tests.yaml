@@ -1,0 +1,47 @@
+name: GitHub Actions for the Skill-Tracker-File project
+run-name: Skill-Tracker-File-Tests
+on: [push]
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      S3_BUCKET_NAME: files
+      S3_ENDPOINT_URL: http://localstack:4566
+      SECURE_CODE: file_secure_code_123
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DB_NAME: file_keys
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Create Docker network
+        run: docker network create app_network || true
+
+      - name: Set up Docker Compose
+        run: docker compose -f docker-compose.yaml up -d
+
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install
+
+      - name: Run Tests
+        run: poetry run coverage run -m pytest
+
+      - name: Report Coverage
+        run: poetry run coverage report --fail-under=80

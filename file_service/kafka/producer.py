@@ -1,7 +1,7 @@
 import json
+from dataclasses import dataclass
 
 from aiokafka import AIOKafkaProducer
-from dataclasses import dataclass
 
 
 @dataclass
@@ -16,7 +16,7 @@ class BrokerProducer:
         await self.producer.stop()
 
     async def send_welcome_email(self, email_data: dict) -> None:
-        encode_email_data = json.dumps(email_data).encode('utf-8')
+        encode_email_data = json.dumps(email_data).encode("utf-8")
         await self.open_connection()
         try:
             await self.producer.send(

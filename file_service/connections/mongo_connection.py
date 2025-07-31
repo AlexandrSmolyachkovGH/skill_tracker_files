@@ -2,6 +2,7 @@ from motor.motor_asyncio import (
     AsyncIOMotorClient,
     AsyncIOMotorDatabase,
 )
+
 from file_service.config import mongo_settings as conf
 
 
@@ -16,8 +17,7 @@ class MongoTool:
         host = conf.MONGO_HOST
         port = conf.MONGO_PORT
         return (
-            f"mongodb://{username}:{password}@"
-            f"{host}:{port}/?authSource=admin"
+            f"mongodb://{username}:{password}@{host}:{port}/?authSource=admin"
         )
 
     def get_mongo_client(
@@ -45,7 +45,7 @@ class MongoTool:
             except Exception as e:
                 raise ValueError(
                     f"Mongo client is not initialized. {e}"
-                )
+                ) from e
         if self.mongo_db is None:
             self.mongo_db = self.mongo_client[db_name]
         return self.mongo_db

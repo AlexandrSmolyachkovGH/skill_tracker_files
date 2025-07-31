@@ -1,8 +1,8 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from httpx import AsyncClient
 from fastapi import status
+from httpx import AsyncClient
 from pytest_mock import MockerFixture
 
 

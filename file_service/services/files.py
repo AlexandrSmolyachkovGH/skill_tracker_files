@@ -1,14 +1,13 @@
 from uuid import uuid4
 
 from file_service.repositories.files import (
-    s3_repo,
     S3Repository,
+    s3_repo,
 )
 from file_service.repositories.outbox import (
-    outbox_repository,
     OutboxMongoRepository,
+    outbox_repository,
 )
-from file_service.connections.mongo_connection import mongo_tool
 
 
 class S3Service:

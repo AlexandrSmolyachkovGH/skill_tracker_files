@@ -1,14 +1,12 @@
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
 from pytest_mock import MockerFixture
-from unittest.mock import (
-    AsyncMock,
-    MagicMock,
-)
 
 from file_service.config import aws_settings
 from file_service.connections.s3_connection import (
-    get_s3_client,
     ensure_bucket_exists,
+    get_s3_client,
     wait_for_localstack,
 )
 

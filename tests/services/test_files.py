@@ -1,25 +1,12 @@
-from unittest.mock import (
-    AsyncMock,
-    MagicMock,
-    patch,
-)
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from pytest_mock import MockerFixture
 
-from file_service.config import (
-    mongo_settings,
-    aws_settings,
-    secret_settings,
-)
+from file_service.config import aws_settings, mongo_settings, secret_settings
 from file_service.routers.files import upload_file
-from file_service.services.files import (
-    s3_service,
-)
-from tests.conftest import (
-    MockS3RepoMethods,
-    MockOutboxRepoMethods,
-)
+from file_service.services.files import s3_service
+from tests.conftest import MockOutboxRepoMethods, MockS3RepoMethods
 
 
 @pytest.mark.asyncio

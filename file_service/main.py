@@ -1,17 +1,15 @@
+from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 import uvicorn
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
 
-from file_service.config import (
-    aws_settings,
-)
+from file_service.config import aws_settings
 from file_service.connections.mongo_connection import mongo_tool
 from file_service.connections.s3_connection import (
+    ensure_bucket_exists,
     get_aws_session,
     get_s3_client,
-    ensure_bucket_exists,
     wait_for_localstack,
 )
 from file_service.msg_creator import msg_creator
@@ -37,25 +35,26 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     mongo_tool.close()
 
+
 app = FastAPI(lifespan=lifespan)
 app.include_router(file_router)
 
 
-@app.get('/', tags=['root'])
+@app.get("/", tags=["root"])
 async def root() -> dict:
     return {
-        'title': msg_creator.get_root_title(),
-        'description': msg_creator.get_root_description(),
-        'paths': {
-            'swagger': '/docs',
-            'redoc': '/redoc',
+        "title": msg_creator.get_root_title(),
+        "description": msg_creator.get_root_description(),
+        "paths": {
+            "swagger": "/docs",
+            "redoc": "/redoc",
         },
     }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(
-        'file_service.main:app',
+        "file_service.main:app",
         host="localhost",
         port=8002,
     )

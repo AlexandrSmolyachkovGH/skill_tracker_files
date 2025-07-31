@@ -2,14 +2,14 @@ from aiobotocore.response import StreamingBody
 
 from file_service.config import aws_settings
 from file_service.connections.s3_connection import (
+    ensure_bucket_exists,
     get_aws_session,
     get_s3_client,
-    ensure_bucket_exists,
 )
 
 
 class S3Repository:
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = get_aws_session()
         self.bucket_name = aws_settings.S3_BUCKET_NAME
 
@@ -33,8 +33,7 @@ class S3Repository:
         return key
 
     async def download_file(
-        self,
-        key: str
+        self, key: str
     ) -> tuple[StreamingBody | None, str | None]:
         """
         Get a file from the S3 bucket.

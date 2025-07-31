@@ -1,0 +1,88 @@
+[project]
+name = "skill-tracker-file"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "AlexandrSmolyachkovGH",email = "alexandr.smolyachkov@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "fastapi (>=0.116.1,<0.117.0)",
+    "uvicorn (>=0.35.0,<0.36.0)",
+    "coverage (>=7.9.2,<8.0.0)",
+    "flake8 (>=7.3.0,<8.0.0)",
+    "mypy (>=1.17.0,<2.0.0)",
+    "isort (>=6.0.1,<7.0.0)",
+    "black (>=25.1.0,<26.0.0)",
+    "pylint (>=3.3.7,<4.0.0)",
+    "pre-commit (>=4.2.0,<5.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)",
+    "pydantic (>=2.11.7,<3.0.0)",
+    "pydantic-settings (>=2.10.1,<3.0.0)",
+    "aioboto3 (>=15.0.0,<16.0.0)",
+    "confluent-kafka (>=2.11.0,<3.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "aiokafka (>=0.12.0,<0.13.0)",
+    "motor (>=3.7.1,<4.0.0)",
+    "pytest (>=8.4.1,<9.0.0)",
+    "pytest-asyncio (>=1.1.0,<2.0.0)",
+    "pytest-mock (>=3.14.1,<4.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+]
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.2.0"
+
+[tool.black]
+line-length = 79
+target-version = ['py310']
+skip-string-normalization = true
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+  | settings\.py
+  | venv
+  | env
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 79
+skip = [
+    "settings.py",
+    ".venv",
+    "env",
+    "build",
+    "dist",
+    "migrations",
+    "__pycache__",
+    ".git",
+    ".env",
+    ".idea"
+]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_unused_ignores = true
+exclude = '(.*/migrations/.*$|.*/settings.*$)'

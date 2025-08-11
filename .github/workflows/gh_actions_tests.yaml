@@ -18,6 +18,8 @@ jobs:
       MONGO_INITDB_ROOT_PASSWORD: example
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: admin
+      KAFKA_ENTRY_POINT: localhost:9092
+      KAFKA_FILE_TOPIC: files-test
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4

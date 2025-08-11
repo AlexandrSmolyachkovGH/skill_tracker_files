@@ -30,6 +30,7 @@ dependencies = [
     "pytest-mock (>=3.14.1,<4.0.0)",
     "httpx (>=0.28.1,<0.29.0)",
     "ruff (>=0.12.7,<0.13.0)",
+    "loguru (>=0.7.3,<0.8.0)",
 ]
 
 [tool.poetry]

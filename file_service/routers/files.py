@@ -1,5 +1,5 @@
-from io import BytesIO
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import (
     APIRouter,
@@ -10,7 +10,6 @@ from fastapi import (
 from fastapi.responses import (
     JSONResponse,
     Response,
-    StreamingResponse,
 )
 
 from file_service.schemes.files import FileUploadResponse
@@ -25,6 +24,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def upload_file(
+    attachment_id: UUID,
     file: Annotated[UploadFile, File(...)],
 ) -> FileUploadResponse:
     content = await file.read()
@@ -32,6 +32,7 @@ async def upload_file(
     filename = file.filename or "new_file"
 
     key = await s3_service.upload_file(
+        attachment_id=attachment_id,
         filename=filename,
         content_type=content_type,
         content=content,
@@ -57,8 +58,8 @@ async def download_file(
             content="File not found",
         )
 
-    return StreamingResponse(
-        content=BytesIO(content),
+    return Response(
+        content=content,
         media_type=content_type or "application/octet-stream",
         headers={
             "Content-Disposition": f"attachment; filename={key}",

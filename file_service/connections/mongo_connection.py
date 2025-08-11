@@ -56,5 +56,11 @@ class MongoTool:
             self.mongo_client = None
             self.mongo_db = None
 
+    def mongo_init(self) -> None:
+        self.get_mongo_client(
+            mongo_uri=self.get_mongo_uri(),
+        )
+        self.get_mongo_db()
+
 
 mongo_tool = MongoTool()

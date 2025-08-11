@@ -1,4 +1,6 @@
-from uuid import uuid4
+import inspect
+import re
+from uuid import UUID
 
 from file_service.repositories.files import (
     S3Repository,
@@ -21,21 +23,27 @@ class S3Service:
 
     def build_key(
         self,
+        attachment_id: UUID,
         filename: str,
     ) -> str:
         """
-        Create file key for the S3 storage.
+        Generate a unique file key for S3 storage
         """
-        key = f"{uuid4()}_{filename}"
+        filename = re.sub(r"\s", "_", filename)
+        key = f"{attachment_id}_{filename}"
         return key
 
     async def upload_file(
         self,
+        attachment_id: UUID,
         content: bytes,
         content_type: str,
         filename: str,
     ) -> str:
-        key = self.build_key(filename=filename)
+        key = self.build_key(
+            attachment_id=attachment_id,
+            filename=filename,
+        )
         key = await s3_repo.upload_file(
             key=key,
             content_type=content_type,
@@ -52,7 +60,19 @@ class S3Service:
         file_data = await s3_repo.download_file(
             key=key,
         )
-        return file_data
+        if file_data is None:
+            return None, None
+
+        content, content_type = file_data
+
+        if content is None:
+            return None, (content_type or "application/octet-stream")
+
+        if hasattr(content, "read"):
+            result = content.read()
+            content = await result if inspect.isawaitable(result) else result
+
+        return content, content_type or "application/octet-stream"
 
 
 s3_service = S3Service()

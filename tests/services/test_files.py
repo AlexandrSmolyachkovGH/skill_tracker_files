@@ -1,12 +1,13 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
+from uuid import uuid4
 
 import pytest
-from pytest_mock import MockerFixture
 
-from file_service.config import aws_settings, mongo_settings, secret_settings
-from file_service.routers.files import upload_file
 from file_service.services.files import s3_service
-from tests.conftest import MockOutboxRepoMethods, MockS3RepoMethods
+from tests.conftest import (
+    MockOutboxRepoMethods,
+    MockS3RepoMethods,
+)
 
 
 @pytest.mark.asyncio
@@ -14,27 +15,42 @@ async def test_s3service(
     mock_s3_repo_methods: MockS3RepoMethods,
     mock_outbox_repo_methods: MockOutboxRepoMethods,
 ) -> None:
-    file_name = "test_file"
-    content_type = "application/octet-stream"
-    content = file_name.encode("utf-8")
-
+    _, download_mock = mock_s3_repo_methods
     service = s3_service
 
-    key = service.build_key(filename=file_name)
-    assert isinstance(key, str)
-    assert key.endswith("_" + file_name)
+    file_name = "test_file"
+    attachment_id = uuid4()
+    content_type = "application/octet-stream"
+    content = file_name.encode()
 
+    key = service.build_key(attachment_id=attachment_id, filename=file_name)
     upload_file_key = await service.upload_file(
         content=content,
         content_type=content_type,
+        attachment_id=attachment_id,
         filename=file_name,
     )
-    assert isinstance(upload_file_key, str)
     assert upload_file_key == "mocked_file_key"
     service.s3_repo.upload_file.assert_awaited_once()
     service.outbox_repo.add_document.assert_awaited_once()
 
-    download_file = await service.download_file(key=key)
-    assert isinstance(download_file, tuple)
-    assert download_file == (b"mocked content", "text/plain")
-    service.s3_repo.download_file.assert_awaited_once()
+    content_obj = AsyncMock()
+    content_obj.read = AsyncMock(return_value=b"mocked content")
+
+    download_mock.side_effect = [
+        (content_obj, "text/plain"),
+        None,
+        (None, None),
+    ]
+
+    data, ctype = await service.download_file(key=key)
+    assert data == b"mocked content"
+    assert ctype == "text/plain"
+
+    data, ctype = await service.download_file(key=key)
+    assert data is None and ctype is None
+
+    data, ctype = await service.download_file(key=key)
+    assert data is None and ctype == "application/octet-stream"
+
+    assert download_mock.await_count == 3

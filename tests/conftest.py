@@ -1,4 +1,8 @@
-from unittest.mock import AsyncMock, MagicMock
+from types import SimpleNamespace
+from unittest.mock import (
+    AsyncMock,
+    MagicMock,
+)
 
 import pytest
 import pytest_asyncio
@@ -8,6 +12,7 @@ from httpx import ASGITransport, AsyncClient
 from pytest_mock import MockerFixture
 
 from file_service.main import app as real_app
+from file_service.repositories.files import S3Repository
 
 
 @pytest.fixture(autouse=True)
@@ -41,15 +46,16 @@ MockS3RepoMethods = tuple[AsyncMock, AsyncMock]
 def mock_s3_repo_methods(
     mocker: MockerFixture,
 ) -> MockS3RepoMethods:
-    mock_upload_file = mocker.patch(
+    mock_upload = mocker.patch(
         "file_service.repositories.files.S3Repository.upload_file",
+        new_callable=AsyncMock,
+        return_value="mocked_file_key",
     )
-    mock_upload_file.return_value = "mocked_file_key"
-    mock_download_file = mocker.patch(
+    mock_download = mocker.patch(
         "file_service.repositories.files.S3Repository.download_file",
+        new_callable=AsyncMock,
     )
-    mock_download_file.return_value = (b"mocked content", "text/plain")
-    return mock_upload_file, mock_download_file
+    return mock_upload, mock_download
 
 
 MockOutboxRepoMethods = tuple[AsyncMock, AsyncMock, AsyncMock, AsyncMock]
@@ -110,3 +116,35 @@ async def client(app_without_lifespan: FastAPI) -> AsyncClient:
     transport = ASGITransport(app=app_without_lifespan)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
+
+@pytest.fixture
+def repo_with_client(
+    mocker: MockerFixture,
+    monkeypatch: MonkeyPatch,
+) -> tuple:
+    mocker.patch(
+        "file_service.repositories.files.get_aws_session",
+        return_value="sess",
+    )
+
+    client = AsyncMock()
+    cm = AsyncMock()
+    cm.__aenter__.return_value = client
+    cm.__aexit__.return_value = None
+    mocker.patch(
+        "file_service.repositories.files.get_s3_client", return_value=cm
+    )
+
+    ensure_mock = mocker.patch(
+        "file_service.repositories.files.ensure_bucket_exists",
+        new_callable=AsyncMock,
+    )
+
+    monkeypatch.setattr(
+        "file_service.repositories.files.aws_settings",
+        SimpleNamespace(S3_BUCKET_NAME="test-bucket"),
+        raising=False,
+    )
+
+    return S3Repository(), client, ensure_mock

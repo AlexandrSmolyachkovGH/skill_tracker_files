@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock
+from uuid import uuid4
 
 import pytest
 from fastapi import status
@@ -13,10 +14,12 @@ async def test_upload_file(
 ) -> None:
     mocker.patch(
         "file_service.services.files.s3_service.upload_file",
+        new_callable=AsyncMock,
         return_value="test_key",
     )
     response = await client.post(
         "/upload",
+        params={"attachment_id": str(uuid4())},
         files={"file": ("test.txt", b"hello", "text/plain")},
     )
     assert response.status_code == 201

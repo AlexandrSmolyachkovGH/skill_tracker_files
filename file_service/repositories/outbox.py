@@ -37,6 +37,19 @@ class OutboxMongoRepository:
             raise e
         return data.model_dump()
 
+    async def get_one_unsent_document(self) -> dict | None:
+        """
+        Get one document with the status False
+        """
+        doc = await self.db[self.coll].find_one({"status": False})
+        if not doc:
+            return None
+        try:
+            data = OutboxScheme(**doc)
+        except ValidationError as e:
+            raise e
+        return data.model_dump()
+
     async def change_status(self, key: str, status: bool = True) -> None:
         await self.db[self.coll].update_one(
             {"key": key},

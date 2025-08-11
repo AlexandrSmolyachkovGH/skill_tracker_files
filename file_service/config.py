@@ -40,3 +40,17 @@ class MongoSettings(BaseConfig):
 
 
 mongo_settings = MongoSettings()
+
+
+class KafkaSettings(BaseConfig):
+    ENTRY_POINT: str
+    FILE_TOPIC: str
+
+    @property
+    def producer_config(self) -> dict:
+        return {
+            "bootstrap_servers": self.ENTRY_POINT,
+        }
+
+
+kafka_settings = KafkaSettings()

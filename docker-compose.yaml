@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    image: skill_tracker_file-app:latest
     container_name: skill-file-service
     depends_on:
       - mongo
@@ -12,6 +13,14 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       S3_ENDPOINT_URL: http://localstack:4566
       S3_BUCKET_NAME: files
+    networks:
+      - app_network
+
+  kafka_file_worker:
+    image: skill_tracker_file-app:latest
+    command: python file_service/kafka/worker.py
+    depends_on:
+      - app
     networks:
       - app_network
 

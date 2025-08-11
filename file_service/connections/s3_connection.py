@@ -8,6 +8,8 @@ from aiobotocore.client import AioBaseClient
 from botocore.exceptions import ClientError
 
 from file_service.config import aws_settings
+from file_service.custom_exceptions.custom import LocalstackError
+from logger.logger_conf import logger
 
 
 def get_aws_session() -> Session:
@@ -39,7 +41,7 @@ async def ensure_bucket_exists(
         if error_code in ("404", "NoSuchBucket"):
             await client.create_bucket(Bucket=bucket_name)
         elif error_code == "403":
-            raise RuntimeError(f"Access denied to bucket {bucket_name}")
+            raise RuntimeError(f"Access denied to bucket {bucket_name}") from e
         else:
             raise
 
@@ -55,7 +57,7 @@ async def wait_for_localstack(
                 async with session.get(url) as resp:
                     if resp.status == 200:
                         return
-        except Exception as e:
-            print(f"Wait for localstack(attempt {attempt}) — {e}")
+        except LocalstackError as e:
+            logger.error(f"Wait for localstack(attempt {attempt}) — {e}")
         await asyncio.sleep(delay)
-    raise RuntimeError(f"LocalStack")
+    raise RuntimeError("LocalStack RuntimeError")
